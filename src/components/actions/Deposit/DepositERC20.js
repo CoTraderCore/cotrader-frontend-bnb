@@ -38,7 +38,7 @@ class DepositERC20 extends Component {
     const symbol = await ercAssetContract.methods.symbol().call()
     const decimals = await ercAssetContract.methods.decimals().call()
     const tokenBalanceInWei = await ercAssetContract.methods.balanceOf(this.props.accounts[0]).call()
-    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(8)
+    const tokenBalance = fromWeiByDecimalsInput(decimals, tokenBalanceInWei)
 
     this.setState({
       ercAssetAddress,
@@ -78,7 +78,7 @@ class DepositERC20 extends Component {
     ).call()
     const userBalanceFromWei = fromWeiByDecimalsInput(ercAssetDecimals, userWalletBalance)
 
-    if(this.state.DepositValue > Number(userBalanceFromWei).toFixed(8)){
+    if(this.state.DepositValue > userBalanceFromWei){
       this.setState({ ValueError:`Not enough ${this.state.symbol}` })
       return
     }
