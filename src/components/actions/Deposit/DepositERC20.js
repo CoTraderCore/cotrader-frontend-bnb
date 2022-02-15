@@ -26,20 +26,28 @@ class DepositERC20 extends Component {
       userWalletBalance:'0',
       isApproved:true,
       aprovePending:false,
-      symbol:'...'
+      symbol:'...',
+      tokenBalance: 0,
+      useMax:false
     }
   }
 
   componentDidMount = async () => {
+    console.log("this.props.accounts[0]", this.props.accounts[0])
     const fund = new this.props.web3.eth.Contract(SmartFundABIV7, this.props.address)
     const ercAssetAddress = await fund.methods.coreFundAsset().call()
     const ercAssetContract = new this.props.web3.eth.Contract(ERC20ABI, ercAssetAddress)
     const symbol = await ercAssetContract.methods.symbol().call()
+    const decimals = await ercAssetContract.methods.decimals().call()
+    const tokenBalanceInWei = await ercAssetContract.methods.balanceOf(this.props.accounts[0]).call()
+    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(2)
 
     this.setState({
       ercAssetAddress,
       ercAssetContract,
-      symbol
+      symbol,
+      tokenBalanceInWei,
+      tokenBalance
     })
   }
 
@@ -177,6 +185,7 @@ class DepositERC20 extends Component {
       min="0"
       placeholder="Amount"
       name="DepositValue"
+      value={this.state.useMax ? this.state.tokenBalance : this.state.DepositValue}
       onChange={e => this.setState({ DepositValue:e.target.value })}
       />
       {
@@ -188,6 +197,18 @@ class DepositERC20 extends Component {
         :
         (null)
       }
+      </Form.Group>
+
+      <Form.Group>
+      <Form.Check
+       type="checkbox"
+       checked={this.state.useMax}
+       onChange={() => this.setState({
+         useMax:!this.state.useMax,
+         DepositValue:this.state.tokenBalance
+       })}
+       label={`Use max ${this.state.tokenBalance} ${this.state.symbol}`}
+      />
       </Form.Group>
 
       {
