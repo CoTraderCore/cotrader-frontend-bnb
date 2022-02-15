@@ -33,7 +33,6 @@ class DepositERC20 extends Component {
   }
 
   componentDidMount = async () => {
-    console.log("this.props.accounts[0]", this.props.accounts[0])
     const fund = new this.props.web3.eth.Contract(SmartFundABIV7, this.props.address)
     const ercAssetAddress = await fund.methods.coreFundAsset().call()
     const ercAssetContract = new this.props.web3.eth.Contract(ERC20ABI, ercAssetAddress)
