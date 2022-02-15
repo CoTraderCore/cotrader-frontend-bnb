@@ -19,8 +19,19 @@ class DepositETH extends Component {
 
     this.state = {
       DepositValue:0,
-      ValueError: ''
+      ValueError: '',
+      tokenBalance:0,
+      useMax:false
     }
+  }
+
+  componentDidMount = async () => {
+    const tokenBalanceInWei = await this.props.web3.eth.getBalance(this.props.accounts[0])
+    const tokenBalance = Number(fromWei(tokenBalanceInWei)).toFixed(4)
+
+    this.setState({
+      tokenBalance
+    })
   }
 
   validation = async () => {
@@ -75,6 +86,7 @@ class DepositETH extends Component {
       min="0"
       placeholder="Amount"
       name="DepositValue"
+      value={this.state.useMax ? this.state.tokenBalance : this.state.DepositValue}
       onChange={e => this.setState({ DepositValue:e.target.value })}
       />
       {
@@ -86,6 +98,18 @@ class DepositETH extends Component {
         :
         (null)
       }
+      </Form.Group>
+      
+      <Form.Group>
+      <Form.Check
+       type="checkbox"
+       checked={this.state.useMax}
+       onChange={() => this.setState({
+         useMax:!this.state.useMax,
+         DepositValue:this.state.tokenBalance
+       })}
+       label={`Use max ${this.state.tokenBalance} ${this.props.mainAsset}`}
+      />
       </Form.Group>
 
       <Button
