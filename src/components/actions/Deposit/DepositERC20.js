@@ -27,8 +27,7 @@ class DepositERC20 extends Component {
       isApproved:true,
       aprovePending:false,
       symbol:'...',
-      tokenBalance: 0,
-      useMax:false
+      tokenBalance: 0
     }
   }
 
@@ -39,7 +38,7 @@ class DepositERC20 extends Component {
     const symbol = await ercAssetContract.methods.symbol().call()
     const decimals = await ercAssetContract.methods.decimals().call()
     const tokenBalanceInWei = await ercAssetContract.methods.balanceOf(this.props.accounts[0]).call()
-    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(4)
+    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(8)
 
     this.setState({
       ercAssetAddress,
@@ -79,7 +78,7 @@ class DepositERC20 extends Component {
     ).call()
     const userBalanceFromWei = fromWeiByDecimalsInput(ercAssetDecimals, userWalletBalance)
 
-    if(Number(this.state.DepositValue) > Number(userBalanceFromWei)){
+    if(this.state.DepositValue > Number(userBalanceFromWei).toFixed(8)){
       this.setState({ ValueError:`Not enough ${this.state.symbol}` })
       return
     }
@@ -178,13 +177,23 @@ class DepositERC20 extends Component {
     return (
       <>
       <Form.Group>
-      <Form.Label>Amount of {this.state.symbol}</Form.Label>
+      <Form.Label>
+      Enter {this.state.symbol}
+      <p
+       style={{color:'blue'}}
+       onClick={() => this.setState({
+        DepositValue:this.state.tokenBalance
+       })}
+      >
+        (balance:{this.state.tokenBalance})
+      </p>
+      </Form.Label>
       <Form.Control
       type="number"
       min="0"
       placeholder="Amount"
       name="DepositValue"
-      value={this.state.useMax ? this.state.tokenBalance : this.state.DepositValue}
+      value={this.state.DepositValue}
       onChange={e => this.setState({ DepositValue:e.target.value })}
       />
       {
@@ -196,18 +205,6 @@ class DepositERC20 extends Component {
         :
         (null)
       }
-      </Form.Group>
-
-      <Form.Group>
-      <Form.Check
-       type="checkbox"
-       checked={this.state.useMax}
-       onChange={() => this.setState({
-         useMax:!this.state.useMax,
-         DepositValue:this.state.tokenBalance
-       })}
-       label={`Use max ${this.state.tokenBalance} ${this.state.symbol}`}
-      />
       </Form.Group>
 
       {
