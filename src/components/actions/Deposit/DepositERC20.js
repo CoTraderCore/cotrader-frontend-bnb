@@ -40,7 +40,7 @@ class DepositERC20 extends Component {
     const symbol = await ercAssetContract.methods.symbol().call()
     const decimals = await ercAssetContract.methods.decimals().call()
     const tokenBalanceInWei = await ercAssetContract.methods.balanceOf(this.props.accounts[0]).call()
-    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(2)
+    const tokenBalance = Number(fromWeiByDecimalsInput(decimals, tokenBalanceInWei)).toFixed(4)
 
     this.setState({
       ercAssetAddress,
